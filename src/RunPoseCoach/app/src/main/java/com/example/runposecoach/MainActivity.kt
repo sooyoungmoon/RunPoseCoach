@@ -1,4 +1,5 @@
 package com.example.runposecoach
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.*
 import android.bluetooth.le.*
@@ -25,21 +26,44 @@ import android.bluetooth.le.ScanResult
 
 private val PERMISSION_REQUEST_CODE = 100
 
+@SuppressLint("MissingPermission")
 class MainActivity : AppCompatActivity() {
 
     // scan results & scan result adapter
     private val scanResults = mutableListOf<ScanResult>()
     private val scanResultAdapter: ScanResultAdapter by lazy {
-        ScanResultAdapter(scanResults) { result ->
+        ScanResultAdapter(scanResults) { result -> // called when a user clicks a scan result
             if (isScanning) {
                 stopBleScan()
             }
             with(result.device) {
+                Log.w("ScanResultAdapter", "Connecting to $address")
+                connectGatt(this@MainActivity, false, gattCallback)
                 //Timber.w("Connecting to $address")
                 //ConnectionManager.connect(this, this@MainActivity)
             }
         }
     }
+
+    // Bluetooth Gatt callback
+    private val gattCallback = object : BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            val deviceAddress = gatt.device.address
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
+                    // TODO: Store a reference to BluetoothGatt
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
+                    gatt.close()
+                }
+            } else {
+                Log.w("BluetoothGattCallback", "Error $status encountered for $deviceAddress! Disconnecting...")
+                gatt.close()
+            }
+        }
+    }
+
 
     private var isScanning = false
         set(value) {
