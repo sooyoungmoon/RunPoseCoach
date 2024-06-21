@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">RunPoseCoach</string>
+    <string name="scan">SCAN</string>
+    <string name="stop">STOP</string>
+    <string name="refresh">REFRESH</string>
+    <string name="title_devices">TITLE</string>
+    <string name="ble_not_supported">BLE_NOT_SUPPORTED</string>
+    <string name="error_bluetooth_not_supported">ERROR_BLUETOOTH_NOT_SUPPORTED</string>
+    <string name="unknown_device">UNKNOWN_DEVICE</string>
+</resources>
